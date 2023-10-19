@@ -7,6 +7,7 @@
     betweenWallet: [ 20, 40 ] // [min, max] in seconds
   },
   buffer: {
-    limit: 512
-  }
+    limit: 64 // how many txs to keep in buffer
+  },
+  drawings: [1, 10], // [min, max] how many txs to do, max should be less than buffer limit
 }

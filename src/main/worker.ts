@@ -11,20 +11,27 @@ export async function worker() {
   const buffer = new TxBuffer(provider)
 
   for (const wallet of CONFIG.mixWallets ? mix(WALLETS) : WALLETS) {
-    const payload = await buffer.get()
-    const [ { inner }, _xs, _ys, _colors ] = payload.arguments as DrawArguments
+    for (let i = 0; i < random(...CONFIG.drawings); i++) {
+      try {
+        const payload = await buffer.get()
+        const [ { inner }, _xs, _ys, _colors ] = payload.arguments as DrawArguments
 
-    const slice = [ 1, random(1, _xs.length - 1) ]
-    const shift = random(0, 7)
+        const slice = [ 1, random(1, _xs.length - 1) ]
+        const shift = random(0, 7)
 
-    const xs = _xs.slice(...slice)
-    const ys = _ys.slice(...slice)
-    const colors = _colors.match(/0\d/g).slice(...slice).map((c) => (parseInt(c) + shift) % 7)
+        const xs = _xs.slice(...slice)
+        const ys = _ys.slice(...slice)
+        const colors = _colors.match(/0\d/g).slice(...slice).map((c) => (parseInt(c) + shift) % 7)
 
-    const tx = await submitTransaction(provider, wallet, { function: DRAW_FUNCTION, arguments: [ inner, xs, ys, colors ], type_arguments: [] })
-    lg(`drawn by https://explorer.aptoslabs.com/txn/${tx.hash}?network=mainnet`)
+        const tx = await submitTransaction(provider, wallet, { function: DRAW_FUNCTION, arguments: [ inner, xs, ys, colors ], type_arguments: [] })
+        await provider.waitForTransaction(tx.hash)
+        lg(`drawn by https://explorer.aptoslabs.com/txn/${tx.hash}?network=mainnet`)
 
-    await sleep(random(...CONFIG.sleep.betweenWallet))
+        await sleep(random(...CONFIG.sleep.betweenWallet))
+      } catch (e) {
+        console.log(e.message ?? 'something went wrong')
+      }
+    }
   }
 }
 
