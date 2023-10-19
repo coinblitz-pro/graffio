@@ -10,25 +10,37 @@ export function isUserTransaction(transaction: any): transaction is any {
 
 export const makeSpinner = (message: string) => {
   let x = 0
+  let interval = undefined
+  let m = message
+  let i = ''
+
   const chars = [ '⠙', '⠘', '⠰', '⠴', '⠤', '⠦', '⠆', '⠃', '⠋', '⠉' ]
 
-  const interval = setInterval(() => {
-    process.stdout.write('\r' + message + chars[x++].padStart(3))
-    x = x % chars.length
-  }, 100)
-
-  const stop = () => {
-    if (interval !== undefined) {
-      clearInterval(interval)
-      process.stdout.write('\r'.padEnd(message.length + 10) + '\r')
-    }
+  return {
+    start: function () {
+      interval = setInterval(() => {
+        process.stdout.write('\r' + m + i + chars[x++].padStart(3))
+        x = x % chars.length
+      }, 100)
+      return this
+    },
+    info: function (message: string) {
+      i = ' ' + message
+    },
+    stop: function () {
+      if (interval !== undefined) {
+        clearInterval(interval)
+        process.stdout.write('\r'.padEnd(m.length + i.length + 10) + '\r')
+      }
+    },
+    [Symbol.dispose]: function () {
+      this.stop()
+    },
   }
-
-  return { stop, [Symbol.dispose]: () => stop() }
 }
 
 export const sleep = async (time: number, withSpinner = true) => {
-  using _ = withSpinner && time > 5 ? makeSpinner(`sleep for ${time}s`) : null
+  using _ = withSpinner && time > 5 ? makeSpinner(`sleep for ${time}s`).start() : null
   await new Promise(resolve => setTimeout(resolve, time * 1000))
 }
 

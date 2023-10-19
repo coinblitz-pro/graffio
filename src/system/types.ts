@@ -8,10 +8,7 @@ export type Config = {
     betweenWallet: [ number, number ]
   }
   buffer: {
-    limits: {
-      soft: number
-      hard: number
-    }
+    limit: number
   }
 }
 

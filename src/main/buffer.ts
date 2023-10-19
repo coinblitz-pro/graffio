@@ -2,12 +2,11 @@ import { AptosClient } from 'aptos'
 import { DRAW_FUNCTION } from '../system/constants'
 import { CONFIG } from '../system/persist'
 import { DrawArguments } from '../system/types'
-import { isEntryFunctionPayload, isUserTransaction, makeSpinner, mix, random, sleep } from '../system/utils'
+import { isEntryFunctionPayload, isUserTransaction, makeSpinner, random, sleep } from '../system/utils'
 
 export class TxBuffer {
   protected buffer: any[] = []
   protected scanned = new Set<number>()
-  protected limits = CONFIG.buffer.limits
 
   constructor(protected provider: AptosClient) {}
 
@@ -17,18 +16,27 @@ export class TxBuffer {
   }
 
   protected async load() {
-    if (this.buffer.length >= this.limits.soft) {
-      return
-    }
+    const left = 104575000
+    const right = 104630000
 
-    const border = 104575000
-    using _ = makeSpinner(`scanning blockchain`)
+    using spinner = makeSpinner(`scanning blockchain`).start()
 
-    for (let height = 104630000; height >= border; height--) {
+    while (this.buffer.length <= CONFIG.buffer.limit) {
+      const height = random(left, right)
+
       if (this.scanned.has(height)) {
         continue
+      }
+
+      this.scanned.add(height)
+      if (this.scanned.size === right - left) {
+        this.scanned.clear()
+        this.buffer = []
+        spinner.stop()
+        await this.load()
+        break
       } else {
-        this.scanned.add(height)
+        spinner.info(`: block ${height}, buffer ${this.buffer.length}`)
       }
 
       const block = await this.provider.getBlockByHeight(height, true)
@@ -43,19 +51,7 @@ export class TxBuffer {
         }
       }
 
-      if (this.buffer.length >= this.limits.hard) {
-        break
-      } else {
-        await sleep(random(0.25, 0.5))
-      }
+      await sleep(random(0.25, 0.5))
     }
-
-    if (this.scanned.has(border)) {
-      this.scanned.clear()
-      this.buffer = []
-      await this.load()
-    }
-
-    this.buffer = mix(this.buffer)
   }
 }
