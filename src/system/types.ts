@@ -5,7 +5,7 @@ export type Config = {
     rpc: string
   }
   sleep: {
-    betweenWallet: [ number, number ]
+    betweenTX: [ number, number ]
   }
   buffer: {
     limit: number

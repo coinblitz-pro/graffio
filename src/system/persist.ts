@@ -12,11 +12,12 @@ export let CONFIG: Config = {
     rpc: 'https://rpc.ankr.com/http/aptos/v1',
   },
   sleep: {
-    betweenWallet: [ 20, 40 ],
+    betweenTX: [ 20, 40 ],
   },
   buffer: {
-    limits: { soft: 512, hard: 1024 },
+    limit: 32,
   },
+  drawings: [ 1, 10 ],
 }
 
 export function loadFile(file: string) {

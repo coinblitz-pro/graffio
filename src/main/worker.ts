@@ -27,7 +27,7 @@ export async function worker() {
         await provider.waitForTransaction(tx.hash)
         lg(`drawn by https://explorer.aptoslabs.com/txn/${tx.hash}?network=mainnet`)
 
-        await sleep(random(...CONFIG.sleep.betweenWallet))
+        await sleep(random(...CONFIG.sleep.betweenTX))
       } catch (e) {
         console.log(e.message ?? 'something went wrong')
       }
