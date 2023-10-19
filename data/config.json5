@@ -1,0 +1,15 @@
+{
+  mixWallets: true,
+  chain: {
+    rpc: 'https://rpc.ankr.com/http/aptos/v1',
+  },
+  sleep: {
+    betweenWallet: [ 20, 40 ], // [min, max] in seconds
+  },
+  buffer: {
+    limits: {
+      soft: 512,
+      hard: 1024
+    },
+  },
+}
