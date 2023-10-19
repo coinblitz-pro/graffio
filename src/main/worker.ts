@@ -21,7 +21,7 @@ export async function worker() {
     const ys = _ys.slice(...slice)
     const colors = _colors.match(/0\d/g).slice(...slice).map((c) => (parseInt(c) + shift) % 7)
 
-    const tx = await submitTransaction(provider, wallet, { function: DRAW_FUNCTION, arguments: [ inner, xs, ys, colors ] })
+    const tx = await submitTransaction(provider, wallet, { function: DRAW_FUNCTION, arguments: [ inner, xs, ys, colors ], type_arguments: [] })
     lg(`drawn by https://explorer.aptoslabs.com/txn/${tx.hash}?network=mainnet`)
 
     await sleep(random(...CONFIG.sleep.betweenWallet))
