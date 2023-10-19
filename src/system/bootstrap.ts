@@ -7,7 +7,7 @@ export async function bootstrap() {
   loadConfigSync()
   loadWalletsSync()
 
-  if (CONFIG.banner) {
+  if (CONFIG.banner !== false) {
     printCoinblitzBanner()
   }
 }
