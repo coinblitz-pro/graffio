@@ -21,12 +21,10 @@ export class TxBuffer {
       return
     }
 
-    const info = await this.provider.getLedgerInfo()
-    const border = 103868316
-
+    const border = 104575000
     using _ = makeSpinner(`scanning blockchain`)
 
-    for (let height = parseInt(info.block_height) - 32; height >= border; height--) {
+    for (let height = 104630000; height >= border; height--) {
       if (this.scanned.has(height)) {
         continue
       } else {
